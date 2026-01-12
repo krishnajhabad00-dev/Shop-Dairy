@@ -1,0 +1,119 @@
+import 'package:flutter/material.dart';
+import 'dart:io';
+
+void main() {
+  runApp(ShopDiaryApp());
+}
+
+class ShopDiaryApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Shop Diary',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: HomeScreen(),
+    );
+  }
+}
+
+// 1. Data Model for Bill
+class BillItem {
+  final String title;
+  final double amount;
+  final DateTime date;
+
+  BillItem({required this.title, required this.amount, required this.date});
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // Sample Data List
+  List<BillItem> diaryEntries = [
+    BillItem(title: "Milk", amount: 50.0, date: DateTime.now()),
+    BillItem(title: "Bread", amount: 30.0, date: DateTime.now()),
+  ];
+
+  // 2. Calculation Logic
+  double calculateTotal() {
+    double total = 0;
+    for (var item in diaryEntries) {
+      // Automatic calculation of all items
+      total += item.amount;
+    }
+    return total;
+  }
+
+  // 3. Notification Logic (WhatsApp/Messenger)
+  void sendNotification(String phoneNumber, double totalBill) {
+    String message = "Hello, your total bill for this month is: $totalBill";
+    
+    // WhatsApp URI logic
+    String whatsappUrl = "whatsapp://send?phone=$phoneNumber&text=${Uri.parse(message)}";
+    // Messenger URI logic (using username or profile link)
+    String messengerUrl = "https://m.me/your_shop_id"; 
+
+    // Yahan hum system ko command dete hain app open karne ki
+    // Note: Iske liye 'url_launcher' plugin base level par chahiye hota hai
+    print("Opening Notification: $message");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Shop Diary")),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: diaryEntries.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(diaryEntries[index].title),
+                  subtitle: Text(diaryEntries[index].date.toString()),
+                  trailing: Text("${diaryEntries[index].amount}"),
+                );
+              },
+            ),
+          ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text("Total Bill: ${calculateTotal()}", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AboutPage())),
+            child: Text("Go to About Section"),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// 4. About Section with your Name
+class AboutPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("About Developer")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("App Name: Digital Shop Diary", style: TextStyle(fontSize: 22)),
+            SizedBox(height: 10),
+            Text("Developed by: [Aapka Naam Yahan]", 
+                 style: TextStyle(fontSize: 18, color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+            SizedBox(height: 20),
+            Text("Version: 1.0.0"),
+          ],
+        ),
+      ),
+    );
+  }
+}
